@@ -1,6 +1,26 @@
 function [ X_opt, iter ] = apglAXB( A, B, X, M, known, para)    
-% min  g(x) + h(x)    
-% g(x) = -trace(AXB')+ \lambda * ||X_\Omega - M_\Omega||_F^2, h(x) = ||X||_*
+%--------------------------------------------------------------------------
+% Xue Shengke, Zhejiang University, April 2017.
+% Contact information: see readme.txt.
+%
+% Hu et al. (2013) TNNR paper, IEEE Transactions on PAMI.
+% First written by debingzhang, Zhejiang Universiy, November 2012.
+%--------------------------------------------------------------------------
+%     iteratively solve the objective: min  g(x) + h(x)
+%     g(x) = ||X||_*
+%     h(x) = - trace(AXB') + \lambda * ||X_\Omega - M_\Omega||_F^2
+%     Inputs:
+%         A                 --- left singular vector
+%         B                 --- right singular vector
+%         X                 --- incomplete image
+%         M                 --- original image
+%         known             --- index matrix of known elements
+%         para              --- struct of parameters
+% 
+%     Outputs: 
+%         X_opt             --- optimized image
+%         iter              --- number of iterations
+%--------------------------------------------------------------------------
 
 DISPLAY_EVERY = 10;
 
@@ -9,9 +29,9 @@ tol = para.apgl_tol;
 lambda = para.apgl_lambda;
 
 AB = A' * B;
-last_X = X;
-Y = last_X;
+Y = X;
 t = 1;
+M_fro = norm(M, 'fro');
 obj_val = zeros(max_iter, 1);
 
 for k = 1 : max_iter
@@ -28,17 +48,18 @@ for k = 1 : max_iter
     % Y update
     Y = X + (last_t-1) / t * (X - last_X);
 
-    delta_X = norm(X - last_X, 'fro') / norm(M, 'fro');
+    delta = norm(X - last_X, 'fro') / M_fro;
     if mod(k, DISPLAY_EVERY) == 0
-        fprintf('    iter %d, ||X_k+1-X_k||_F=%.4f', k, delta_X);
+        fprintf('    iter %d, ||X_k+1-X_k||_F/||M||_F=%.4f', k, delta);
     end
-    if delta_X < tol
+    if delta < tol
         fprintf('    converged at\n');
-        fprintf('    iter %d, ||X_k+1-X_k||_F=%.4f\n', k, delta_X);
+        fprintf('    iter %d, ||X_k+1-X_k||_F/||M||_F=%.4f\n', k, delta);
         break ;
     end
 
-    obj_val(k) = nuclear_norm(X) - trace(A*X*B') + lambda / 2 * norm((X-M).*known, 'fro')^2;
+    obj_val(k) = nuclear_norm(X) - trace(A*X*B') ...
+        + lambda / 2 * norm((X-M).*known, 'fro')^2;
     if mod(k, DISPLAY_EVERY) == 0
         fprintf(', obj value=%.4f\n', obj_val(k));
     end
@@ -52,13 +73,4 @@ end
 X_opt = X;
 iter = k;
 
-end
-
-function obj = nuclear_norm(X)
-    if size(X, 1) > 2000
-        sigma = svds(X, 100);
-    else
-        sigma = svd(X);
-    end
-    obj = sum(sigma);
 end

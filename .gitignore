@@ -1,4 +1,7 @@
 # ignore files except *.fig or *.m
 
+*.m~
+*.asv
+
 /TNNR-admm/result
 /TNNR-apgl/result
