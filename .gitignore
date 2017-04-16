@@ -1,0 +1,4 @@
+# ignore files except *.fig or *.m
+
+/TNNR-admm/result
+/TNNR-apgl/result
