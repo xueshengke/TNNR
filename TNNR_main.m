@@ -31,42 +31,28 @@ for i = 1 : num_mask
     mask_list{i} = file_list(i+2).name;
 end
 
-% imagenum = 6;
-% pic_name = pic_list{imagenum};
-% 
-% Xfull = double(imread(pic_name));
-% [m, n, dim] = size(Xfull);
-
 %% parameter configuration
-image_id = 1;            % select an image for experiment
-mask_id  = 4;            % select a mask for experiment
+image_id = 9;            % select an image for experiment
+mask_id  = 9;            % select a mask for experiment
 
 para.block = 1;          % 1 for block occlusion, 0 for random noise
 para.lost = 0.50;        % percentage of lost elements in matrix
 para.save_eps = 1;       % save eps figure in result directory
-para.min_R = 10;         % minimum rank of chosen image
-para.max_R = 15;         % maximum rank of chosen image
+para.min_R =  1;         % minimum rank of chosen image
+para.max_R = 20;         % maximum rank of chosen image
 % it requires to test all ranks from min_R to max_R, note that different
 % images have different ranks, and various masks affect the ranks, too.
 
-para.outer_iter = 25;    % number of the outer iteration
-para.outer_tol = 1e-3;   % epsilon of the outer iteration
+para.outer_iter = 50;    % number of the outer iteration
+para.outer_tol = 2e-3;   % epsilon of the outer iteration
 
-para.admm_iter = 200;    % iteration of the ADMM optimization
-para.admm_tol = 1e-4;    % epsilon of the ADMM optimization
+para.admm_iter = 500;    % iteration of the ADMM optimization
+para.admm_tol = 2e-4;    % epsilon of the ADMM optimization
 para.admm_rho = 5e-2;    % rho of the the ADMM optimization
 
 para.apgl_iter = 200;    % iteration of the APGL optimization
 para.apgl_tol = 1e-4;    % epsilon of the APGL optimization
 para.apgl_lambda = 1e-2; % lambda of the the APGL optimization
-
-% %% ratio of missing pixels
-% index = randi([0, 100-1], m, n);
-% oldidx = index;
-% lost = para.lost * 100;
-% fprintf('%d%% elements are missing\n', lost);
-% index = (oldidx < (100-lost));
-% mask = repmat(index, [1 1 dim]);  % index matrix of the known elements
 
 %% select an image and a mask for experiment
 image_name = image_list{image_id};
@@ -94,21 +80,18 @@ fprintf('ADMM optimization method to recovery an image with missing pixels\n');
 t1 = tic;
 [admm_res, X_rec]= admm_pic(admm_result, image_name, X_full, mask, para);
 
-% admm_iteration = admm_res.iterations(admm_res.rank);
-% admm_psnr = admm_res.psnr;
-% admm_time_cost = toc(t1);
-% admm_rank = admm_res.rank;
-
 admm_rank = admm_res.best_rank;
 admm_psnr = admm_res.best_psnr;
 admm_erec = admm_res.best_erec;
 admm_time_cost = admm_res.time(admm_rank);
-admm_iteration = admm_res.iterations(apgl_rank, :);
+admm_iteration = admm_res.iterations(admm_rank, :);
+admm_total_iter = admm_res.total_iter(admm_rank, :);
 
-fpritnf('\nTNNR-ADMM: ');
-fprintf('rank=%d, psnr=%f, erec=%f, time=%f s, iteration=(%d,%d,%d)\n', ...
+fprintf('\nTNNR-ADMM: ');
+fprintf('rank=%d, psnr=%f, erec=%f, time=%f s, iteration=%d(%d),%d(%d),%d(%d),\n', ...
     admm_rank, admm_psnr, admm_erec, admm_time_cost, admm_iteration(1), ...
-    admm_iteration(2), admm_iteration(3));
+    admm_total_iter(1), admm_iteration(2), admm_total_iter(2), admm_iteration(3), ...
+    admm_total_iter(3));
 disp(' ');
 
 figure('NumberTitle', 'off', 'Name', 'TNNR-ADMM result');
@@ -132,13 +115,6 @@ plot(admm_res.Erec_iter, '^-');
 xlabel('Iteration');
 ylabel('Recovery error');
 
-% fprintf('\nTNNR-ADMM: rank=%d, psnr=%.3f, time=%.1f s, iteration=%d\n', ...
-%     admm_rank, admm_psnr, admm_time_cost, admm_iteration);
-% disp(' ');
-para.admm_iter = 200;    % iteration of the ADMM optimization
-para.admm_tol = 1e-4;    % epsilon of the ADMM optimization
-para.admm_rho = 5e-2;    % rho of the the ADMM optimization
-
 %% record test results
 outputFileName = fullfile(admm_result, 'parameters.txt'); 
 fid = fopen(outputFileName, 'a') ;
@@ -160,40 +136,30 @@ fprintf(fid, '%s\n', ['rank: '            num2str(admm_rank)       ]);
 fprintf(fid, '%s\n', ['psnr: '            num2str(admm_psnr)       ]);
 fprintf(fid, '%s\n', ['recovery error: '  num2str(admm_erec)       ]);
 fprintf(fid, '%s\n', ['time cost: '       num2str(admm_time_cost)  ]);
-fprintf(fid, 'iteration: %d, %d, %d\n',   admm_iteration(1), ...
+fprintf(fid, 'outer iteration: %d, %d, %d\n',   admm_iteration(1), ...
     admm_iteration(2), admm_iteration(3));
+fprintf(fid, 'total iteration: %d, %d, %d\n',   admm_total_iter(1), ...
+    admm_total_iter(2), admm_total_iter(3));
 fprintf(fid, '--------------------\n');
 fclose(fid);
 
 %% run truncated nuclear norm regularization through APGL
 fprintf('APGL optimization method to recovery an image with missing pixels\n');
 t2 = tic;
-[apgl_res, X_rec]= apgl_pic(apgl_result, image_name, Xfull, mask, para);
-
-% apgl_iteration = apgl_res.iterations(apgl_res.rank);
-% apgl_psnr = apgl_res.psnr;
-% apgl_time_cost = toc(t2);
-% apgl_rank = apgl_res.rank;
-% 
-% figure;
-% plot(apgl_res.Rank, apgl_res.Psnr, 'diamond-');
-% title('TNNR-APGL');
-% xlabel('Rank');
-% ylabel('PSNR');
-% 
-% fprintf('\nTNNR-APGL: rank=%d, psnr=%.3f, time=%.1f s, iterations=%d\n', ...
-%     apgl_rank, apgl_psnr, apgl_time_cost, apgl_iteration);
+[apgl_res, X_rec]= apgl_pic(apgl_result, image_name, X_full, mask, para);
 
 apgl_rank = apgl_res.best_rank;
 apgl_psnr = apgl_res.best_psnr;
 apgl_erec = apgl_res.best_erec;
 apgl_time_cost = apgl_res.time(apgl_rank);
 apgl_iteration = apgl_res.iterations(apgl_rank, :);
+apgl_total_iter = apgl_res.total_iter(apgl_rank, :);
 
-fpritnf('\nTNNR-APGL: ');
-fprintf('rank=%d, psnr=%f, erec=%f, time=%f s, iteration=(%d,%d,%d)\n', ...
+fprintf('\nTNNR-APGL: ');
+fprintf('rank=%d, psnr=%f, erec=%f, time=%f s, iteration=%d(%d),%d(%d),%d(%d),\n', ...
     apgl_rank, apgl_psnr, apgl_erec, apgl_time_cost, apgl_iteration(1), ...
-    apgl_iteration(2), apgl_iteration(3));
+    apgl_total_iter(1), apgl_iteration(2), apgl_total_iter(2), apgl_iteration(3), ...
+    apgl_total_iter(3));
 disp(' ');
 
 figure('NumberTitle', 'off', 'Name', 'TNNR-APGL result');
@@ -238,7 +204,9 @@ fprintf(fid, '%s\n', ['rank: '            num2str(apgl_rank)       ]);
 fprintf(fid, '%s\n', ['psnr: '            num2str(apgl_psnr)       ]);
 fprintf(fid, '%s\n', ['recovery error: '  num2str(apgl_erec)       ]);
 fprintf(fid, '%s\n', ['time cost: '       num2str(apgl_time_cost)  ]);
-fprintf(fid, 'iteration: %d, %d, %d\n',   apgl_iteration(1), ...
+fprintf(fid, 'outer iteration: %d, %d, %d\n',   apgl_iteration(1), ...
     apgl_iteration(2), apgl_iteration(3));
+fprintf(fid, 'total iteration: %d, %d, %d\n',   apgl_total_iter(1), ...
+    apgl_total_iter(2), apgl_total_iter(3));
 fprintf(fid, '--------------------\n');
 fclose(fid);

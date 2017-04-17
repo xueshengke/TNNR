@@ -30,21 +30,16 @@ max_R    = para.max_R;        % maximum rank of chosen image
 max_iter = para.outer_iter;   % maximum number of outer iteration
 tol      = para.outer_tol;    % tolerance of outer iteration
 
-% Psnr = zeros(max_R, 1);
-% time_cost = zeros(max_R, 1);
-% iter_cost = zeros(max_R, 1);
-
 Erec = zeros(max_R, 1);  % reconstruction error, best value in each rank
 Psnr = zeros(max_R, 1);  % PSNR, best value in each rank
 time_cost = zeros(max_R, 1);        % consuming time, each rank
 iter_cost = zeros(max_R, dim);      % number of iterations, each channel
+total_iter = zeros(max_R, dim);     % number of total iterations
 X_rec = zeros(m, n, dim, max_iter); % recovered image under the best rank
 
 best_rank = 0;  % record the best value
 best_psnr = 0;
 best_erec = 0;
-
-% Xrecover = zeros(m, n, dim, max_R);
 
 figure('NumberTitle', 'off', 'Name', 'TNNR-ADMM image');
 subplot(1,3,1);
@@ -73,7 +68,8 @@ for R = min_R : max_R    % test if each rank is proper for completion
             [X, iter_count] = admmAXB(A, B, X, M, known, para);
             X_iter(:, :, c, i) = X;
             
-            iter_cost(R, c) = iter_cost(R, c) + iter_count;
+            iter_cost(R, c) = iter_cost(R, c) + 1;
+            total_iter(R, c) = total_iter(R, c) + iter_count;
             
             delta = norm(X - last_X, 'fro') / M_fro;
             fprintf('||X_k+1-X_k||_F/||M||_F %.4f\n', delta);
@@ -129,6 +125,7 @@ end
 %% record performances for output
 result.time = time_cost;
 result.iterations = iter_cost;
+result.total_iter = total_iter;
 result.best_rank = best_rank;
 result.best_psnr = best_psnr;
 result.best_erec = best_erec;
