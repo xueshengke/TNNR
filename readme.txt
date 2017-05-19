@@ -33,7 +33,7 @@ more details are demonstrated.
 If you have any questions about this implementation, please do not hesitate 
 to contact me.
 
-Shengke Xue, 
+Ph.D. Candidate, Shengke Xue, 
 College of Information Science and Electronic Engineering,
 Zhejiang University, Hangzhou, P. R. China,
 e-mail: (either one is o.k.)

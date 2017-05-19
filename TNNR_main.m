@@ -1,4 +1,4 @@
-% Xue Shengke, Zhejiang University, April 2017. 
+% Shengke Xue, Zhejiang University, April 2017. 
 % Contact information: see readme.txt.
 %
 % Reference: 

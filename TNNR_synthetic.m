@@ -23,7 +23,6 @@ if ~exist(admm_result, 'dir'),   mkdir(admm_result); end
 if ~exist(apgl_result, 'dir'),   mkdir(apgl_result); end
 
 %% parameter configuration
-% para.block = 1;          % 1 for block occlusion, 0 for random noise
 para.lost = 0.50;        % percentage of lost elements in matrix
 para.save_eps = 0;       % save eps figure in result directory
 para.min_R = 1;          % minimum rank of chosen image
@@ -31,7 +30,7 @@ para.max_R = 15;          % maximum rank of chosen image
 % it requires to test all ranks from min_R to max_R, note that different
 % images have different ranks, and various masks affect the ranks, too.
 
-para.outer_iter = 100;     % maximum number of iteration
+para.outer_iter = 200;     % maximum number of iteration
 para.outer_tol = 3e-4;     % tolerance of iteration
 
 para.admm_iter = 200;    % iteration of the ADMM optimization
@@ -49,7 +48,7 @@ m = 200;
 n = 200;
 dim = 3;
 r = 10;
-sigma = 0.1;    % [0.1, 0.9]
+sigma = 0.3;    % [0.1, 0.9]
 
 %% random loss
 rnd_idx = randi([0, 100-1], m, n);
@@ -58,11 +57,10 @@ lost = para.lost * 100;
 fprintf('loss: %d%% elements are missing.\n', lost);
 rnd_idx = double(old_idx < (100-lost));
 mask = repmat(rnd_idx, [1 1 dim]); % index matrix of the known elements
-% missing = ones(size(mask)) - mask; % index matrix of the unknown elements
 
-L = rand(m, r);
-R = rand(n, r);
-noise = sigma * rand(m, n);
+L = randn(m, r);
+R = randn(n, r);
+noise = sigma * randn(m, n);
 M = L * R' + noise * mask(:,:,1);
 M = mapminmax(M, 0, 255);
 X_full = repmat(M, [1 1 dim]);
@@ -122,10 +120,7 @@ outputFileName = fullfile(admm_result, 'parameters.txt');
 fid = fopen(outputFileName, 'a') ;
 fprintf(fid, '****** %s ******\n', datestr(now,0));
 fprintf(fid, '%s\n', ['image: '           image_name               ]);
-% fprintf(fid, '%s\n', ['mask: '            mask_list{mask_id}       ]);
-% fprintf(fid, '%s\n', ['block or noise: '  num2str(para.block)      ]);
 fprintf(fid, '%s\n', ['loss ratio: '      num2str(para.lost)       ]);
-% fprintf(fid, '%s\n', ['save eps figure: ' num2str(para.save_eps)   ]);
 fprintf(fid, '%s\n', ['min rank: '        num2str(para.min_R)      ]);
 fprintf(fid, '%s\n', ['max rank: '        num2str(para.max_R)      ]);
 fprintf(fid, '%s\n', ['max iteration: '   num2str(para.outer_iter) ]);
@@ -201,10 +196,7 @@ outputFileName = fullfile(apgl_result, 'parameters.txt');
 fid = fopen(outputFileName, 'a') ;
 fprintf(fid, '****** %s ******\n', datestr(now,0));
 fprintf(fid, '%s\n', ['image: '           image_name               ]);
-% fprintf(fid, '%s\n', ['mask: '            mask_list{mask_id}       ]);
-% fprintf(fid, '%s\n', ['block or noise: '  num2str(para.block)      ]);
 fprintf(fid, '%s\n', ['loss ratio: '      num2str(para.lost)       ]);
-% fprintf(fid, '%s\n', ['save eps figure: ' num2str(para.save_eps)   ]);
 fprintf(fid, '%s\n', ['min rank: '        num2str(para.min_R)      ]);
 fprintf(fid, '%s\n', ['max rank: '        num2str(para.max_R)      ]);
 fprintf(fid, '%s\n', ['max iteration: '   num2str(para.outer_iter) ]);
