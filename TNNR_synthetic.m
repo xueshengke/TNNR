@@ -17,8 +17,8 @@ addpath TNNR-admm;
 addpath TNNR-apgl;
 
 %% read image files directory information
-admm_result = './TNNR-admm/result/image';
-apgl_result = './TNNR-apgl/result/image';
+admm_result = './TNNR-admm/result/synthetic';
+apgl_result = './TNNR-apgl/result/synthetic';
 if ~exist(admm_result, 'dir'),   mkdir(admm_result); end
 if ~exist(apgl_result, 'dir'),   mkdir(apgl_result); end
 
@@ -27,12 +27,12 @@ if ~exist(apgl_result, 'dir'),   mkdir(apgl_result); end
 para.lost = 0.50;        % percentage of lost elements in matrix
 para.save_eps = 0;       % save eps figure in result directory
 para.min_R = 1;          % minimum rank of chosen image
-para.max_R = 20;          % maximum rank of chosen image
+para.max_R = 15;          % maximum rank of chosen image
 % it requires to test all ranks from min_R to max_R, note that different
 % images have different ranks, and various masks affect the ranks, too.
 
-para.outer_iter = 200;     % maximum number of iteration
-para.outer_tol = 5e-4;     % tolerance of iteration
+para.outer_iter = 100;     % maximum number of iteration
+para.outer_tol = 3e-4;     % tolerance of iteration
 
 para.admm_iter = 200;    % iteration of the ADMM optimization
 para.admm_tol = 1e-4;    % epsilon of the ADMM optimization
@@ -134,6 +134,7 @@ fprintf(fid, '%s\n', ['ADMM iteration: '  num2str(para.admm_iter)  ]);
 fprintf(fid, '%s\n', ['ADMM tolerance: '  num2str(para.admm_tol)   ]);
 fprintf(fid, '%s\n', ['ADMM rho: '        num2str(para.admm_rho)   ]);
 
+fprintf(fid, '%s\n', ['sigma: '           num2str(sigma)           ]);
 fprintf(fid, '%s\n', ['rank: '            num2str(admm_rank)       ]);
 fprintf(fid, '%s\n', ['psnr: '            num2str(admm_psnr)       ]);
 fprintf(fid, '%s\n', ['recovery error: '  num2str(admm_erec)       ]);
@@ -212,6 +213,7 @@ fprintf(fid, '%s\n', ['APGL iteration: '  num2str(para.apgl_iter)  ]);
 fprintf(fid, '%s\n', ['APGL tolerance: '  num2str(para.apgl_tol)   ]);
 fprintf(fid, '%s\n', ['APGL lambda: '     num2str(para.apgl_lambda)]);
 
+fprintf(fid, '%s\n', ['sigma: '           num2str(sigma)           ]);
 fprintf(fid, '%s\n', ['rank: '            num2str(apgl_rank)       ]);
 fprintf(fid, '%s\n', ['psnr: '            num2str(apgl_psnr)       ]);
 fprintf(fid, '%s\n', ['recovery error: '  num2str(apgl_erec)       ]);

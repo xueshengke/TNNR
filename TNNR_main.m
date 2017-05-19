@@ -33,19 +33,19 @@ for i = 1 : num_mask
 end
 
 %% parameter configuration
-image_id = 9;            % select an image for experiment
-mask_id  = 6;            % select a mask for experiment
+image_id = 8;            % select an image for experiment
+mask_id  = 4;            % select a mask for experiment
 
-para.block = 0;          % 1 for block occlusion, 0 for random noise
-para.lost = 0.10;        % percentage of lost elements in matrix
+para.block = 1;          % 1 for block occlusion, 0 for random noise
+para.lost = 0.40;        % percentage of lost elements in matrix
 para.save_eps = 1;       % save eps figure in result directory
 para.min_R =  1;         % minimum rank of chosen image
-para.max_R = 10;         % maximum rank of chosen image
+para.max_R = 20;         % maximum rank of chosen image
 % it requires to test all ranks from min_R to max_R, note that different
 % images have different ranks, and various masks affect the ranks, too.
 
-para.outer_iter = 200;     % maximum number of iteration
-para.outer_tol = 5e-4;     % tolerance of iteration
+para.outer_iter = 100;     % maximum number of iteration
+para.outer_tol = 3e-4;     % tolerance of iteration
 
 para.admm_iter = 200;    % iteration of the ADMM optimization
 para.admm_tol = 1e-4;    % epsilon of the ADMM optimization
