@@ -9,7 +9,8 @@ First written by debingzhang, Zhejiang Universiy, November 2012.
 
 The code contains:
 |--------------
-|-- TNNR_main.m            entrance to start the experiment
+|-- TNNR_main.m            entrance to start real image experiment
+|-- TNNR_synthetic.m       entrance to start synthetic experiment
 |-- function
     |-- PSNR.m             compute the PSNR and Erec for recovered image
     |-- nuclear_norm.m     compute the nuclear norm of matrix
