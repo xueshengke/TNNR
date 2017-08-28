@@ -22,8 +22,8 @@ function [result, X_rec] = admm_pic(result_dir, image_name, X_full, mask, para)
 
 X_miss = X_full .* mask;	  % incomplete image with some pixels lost
 [m, n, dim] = size(X_full);
-known = mask(:, :, 1);        % index matrix of known elements
-missing = ones(m,n) - known;  % index matrix of missing elements
+known = mask;                 % index matrix of known elements
+missing = ones(size(mask)) - known;  % index matrix of missing elements
 
 min_R    = para.min_R;        % minimum rank of chosen image
 max_R    = para.max_R;        % maximum rank of chosen image
@@ -65,7 +65,7 @@ for R = min_R : max_R    % test if each rank is proper for completion
             fprintf('iter %d\n', i);
             [U, sigma, V] = svd(X);
             A = U(:, 1:R)'; B = V(:, 1:R)';
-            [X, iter_count] = admmAXB(A, B, X, M, known, para);
+            [X, iter_count] = admmAXB(A, B, X, M, known(:,:,c), para);
             X_iter(:, :, c, i) = X;
             
             iter_cost(R, c) = iter_cost(R, c) + 1;

@@ -36,7 +36,7 @@ end
 image_id = 8;            % select an image for experiment
 mask_id  = 4;            % select a mask for experiment
 
-para.block = 1;          % 1 for block occlusion, 0 for random noise
+para.block = 0;          % 1 for block occlusion, 0 for random noise
 para.lost = 0.40;        % percentage of lost elements in matrix
 para.save_eps = 1;       % save eps figure in result directory
 para.min_R =  1;         % minimum rank of chosen image
@@ -69,18 +69,26 @@ if para.block
     fprintf('mask: %s.\n', mask_list{mask_id});
 else
     % random loss
-    rnd_idx = randi([0, 100-1], m, n);
+%     rnd_idx = randi([0, 100-1], m, n);
+%     old_idx = rnd_idx;
+%     lost = para.lost * 100;
+%     fprintf('loss: %d%% elements are missing.\n', lost);
+%     rnd_idx = double(old_idx < (100-lost));
+%     mask = repmat(rnd_idx, [1 1 dim]); % index matrix of the known elements
+    
+    rnd_idx = randi([0, 100-1], m, n, dim);
     old_idx = rnd_idx;
     lost = para.lost * 100;
     fprintf('loss: %d%% elements are missing.\n', lost);
     rnd_idx = double(old_idx < (100-lost));
-    mask = repmat(rnd_idx, [1 1 dim]); % index matrix of the known elements
+    mask = rnd_idx; % index matrix of the known elements
 end
 
 %% run truncated nuclear norm regularization through ADMM
 fprintf('ADMM optimization method to recovery an image with missing pixels\n');
 t1 = tic;
 [admm_res, X_rec]= admm_pic(admm_result, image_name, X_full, mask, para);
+toc(t1);
 
 admm_rank = admm_res.best_rank;
 admm_psnr = admm_res.best_psnr;
@@ -159,6 +167,7 @@ fclose(fid);
 fprintf('APGL optimization method to recovery an image with missing pixels\n');
 t2 = tic;
 [apgl_res, X_rec]= apgl_pic(apgl_result, image_name, X_full, mask, para);
+toc(t2);
 
 apgl_rank = apgl_res.best_rank;
 apgl_psnr = apgl_res.best_psnr;
