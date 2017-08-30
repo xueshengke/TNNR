@@ -85,7 +85,7 @@ else
 end
 
 %% run truncated nuclear norm regularization through ADMM
-fprintf('ADMM optimization method to recovery an image with missing pixels\n');
+fprintf('ADMM optimization method to recover an image with missing pixels\n');
 t1 = tic;
 [admm_res, X_rec]= admm_pic(admm_result, image_name, X_full, mask, para);
 toc(t1);
@@ -164,7 +164,7 @@ fprintf(fid, '--------------------\n');
 fclose(fid);
 
 %% run truncated nuclear norm regularization through APGL
-fprintf('APGL optimization method to recovery an image with missing pixels\n');
+fprintf('APGL optimization method to recover an image with missing pixels\n');
 t2 = tic;
 [apgl_res, X_rec]= apgl_pic(apgl_result, image_name, X_full, mask, para);
 toc(t2);
