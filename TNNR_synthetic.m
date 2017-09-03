@@ -1,4 +1,4 @@
-% Xue Shengke, Zhejiang University, April 2017. 
+% Shengke Xue, Zhejiang University, April 2017. 
 % Contact information: see readme.txt.
 %
 % Reference: 
@@ -69,6 +69,7 @@ X_full = repmat(M, [1 1 dim]);
 fprintf('ADMM optimization method to recovery an image with missing pixels\n');
 t1 = tic;
 [admm_res, X_rec]= admm_pic(admm_result, image_name, X_full, mask, para);
+toc(t1);
 
 admm_rank = admm_res.best_rank;
 admm_psnr = admm_res.best_psnr;
@@ -145,6 +146,7 @@ fclose(fid);
 fprintf('APGL optimization method to recovery an image with missing pixels\n');
 t2 = tic;
 [apgl_res, X_rec]= apgl_pic(apgl_result, image_name, X_full, mask, para);
+toc(t2);
 
 apgl_rank = apgl_res.best_rank;
 apgl_psnr = apgl_res.best_psnr;
