@@ -10,21 +10,25 @@
 
 %% add path
 close all; clear ; clc;
-addpath pic ;
-addpath mask ;
-addpath function ;
-addpath TNNR-admm;
-addpath TNNR-apgl;
+% addpath pic ;
+% addpath mask ;
+% addpath function ;
+% addpath TNNR-admm;
+% addpath TNNR-apgl;
+addpath(genpath(cd));
 
 %% read image files directory information
 admm_result = './TNNR-admm/result/image';
 apgl_result = './TNNR-apgl/result/image';
 if ~exist(admm_result, 'dir'),   mkdir(admm_result); end
 if ~exist(apgl_result, 'dir'),   mkdir(apgl_result); end
-image_list = {'re1.jpg', 're2.jpg', 're3.jpg', 're4.jpg', 're5.jpg', ...
-              're6.jpg', 're7.jpg', 're8.jpg', 're9.jpg', 're10.jpg', ...
-              're11.jpg' };
-
+% image_list = {'re1.jpg', 're2.jpg', 're3.jpg', 're4.jpg', 're5.jpg', ...
+%               're6.jpg', 're7.jpg', 're8.jpg', 're9.jpg', 're10.jpg', ...
+%               're11.jpg' };
+image_list = {'new1.jpg', 'new2.jpg', 'new3.jpg', 'new4.jpg', 'new5.jpg', ...
+              'new6.jpg', 'new7.jpg', 'new8.jpg', 'new9.jpg', 'new10.jpg', ...
+             };
+         
 file_list = dir('mask');
 num_mask = length(file_list) - 2;
 mask_list = cell(num_mask, 1);
@@ -33,11 +37,11 @@ for i = 1 : num_mask
 end
 
 %% parameter configuration
-image_id = 8;            % select an image for experiment
+image_id = 9;            % select an image for experiment
 mask_id  = 4;            % select a mask for experiment
 
 para.block = 0;          % 1 for block occlusion, 0 for random noise
-para.lost = 0.40;        % percentage of lost elements in matrix
+para.lost = 0.50;        % percentage of lost elements in matrix
 para.save_eps = 1;       % save eps figure in result directory
 para.min_R =  1;         % minimum rank of chosen image
 para.max_R = 20;         % maximum rank of chosen image

@@ -10,11 +10,12 @@
 
 %% add path
 close all; clear ; clc;
-addpath pic ;
-addpath mask ;
-addpath function ;
-addpath TNNR-admm;
-addpath TNNR-apgl;
+% addpath pic ;
+% addpath mask ;
+% addpath function ;
+% addpath TNNR-admm;
+% addpath TNNR-apgl;
+addpath(genpath(cd));
 
 %% read image files directory information
 admm_result = './TNNR-admm/result/synthetic';
@@ -26,7 +27,7 @@ if ~exist(apgl_result, 'dir'),   mkdir(apgl_result); end
 para.lost = 0.50;        % percentage of lost elements in matrix
 para.save_eps = 0;       % save eps figure in result directory
 para.min_R = 1;          % minimum rank of chosen image
-para.max_R = 15;          % maximum rank of chosen image
+para.max_R = 20;          % maximum rank of chosen image
 % it requires to test all ranks from min_R to max_R, note that different
 % images have different ranks, and various masks affect the ranks, too.
 
